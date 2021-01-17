@@ -242,34 +242,34 @@ for ( w in 1:nrow(wgtlist) ) {
 		}
 		
 		if ( !cur.FAIL ) {
-			# Compute TWAS Z-score
-			cur.twasz = wgt.matrix[,mod.best] %*% cur.Z
-			cur.twasr2pred = wgt.matrix[,mod.best] %*% cur.LD %*% wgt.matrix[,mod.best]
+			# Compute PWAS Z-score
+			cur.pwasz = wgt.matrix[,mod.best] %*% cur.Z
+			cur.pwasr2pred = wgt.matrix[,mod.best] %*% cur.LD %*% wgt.matrix[,mod.best]
 					
-			if ( cur.twasr2pred > 0 ) {
-				cur.twas = cur.twasz / sqrt(cur.twasr2pred)
+			if ( cur.pwasr2pred > 0 ) {
+				cur.pwas = cur.pwasz / sqrt(cur.pwasr2pred)
 				# Perform the permutation test
-				if ( !is.na(opt$perm) && opt$perm > 0 && cur.twas^2 > permz^2 ) {
-					perm.twas = rep(NA,opt$perm)
+				if ( !is.na(opt$perm) && opt$perm > 0 && cur.pwas^2 > permz^2 ) {
+					perm.pwas = rep(NA,opt$perm)
 					perm.pval = NA
 					for ( i in 1:opt$perm ) {
 						perm.wgt = wgt.matrix[ sample( nrow(wgt.matrix) ) , mod.best ]
-						perm.twas[i] = perm.wgt %*% cur.Z / sqrt( perm.wgt %*% cur.LD %*% perm.wgt )
+						perm.pwas[i] = perm.wgt %*% cur.Z / sqrt( perm.wgt %*% cur.LD %*% perm.wgt )
 					
 						# adaptive permutation, stop if 10 instances were observed
 						# see: Che et al. PMC4070098 for derivations
-						if ( sum(perm.twas[1:i]^2 > cur.twas[1]^2) > 10 ) {
-							perm.pval = (sum(perm.twas[1:i]^2 > cur.twas[1]^2) + 1) / (i+1)
+						if ( sum(perm.pwas[1:i]^2 > cur.pwas[1]^2) > 10 ) {
+							perm.pval = (sum(perm.pwas[1:i]^2 > cur.pwas[1]^2) + 1) / (i+1)
 							perm.N = i+1
 							break()
 						}
 					}
 					
 					if ( is.na(perm.pval) ) {
-						perm.pval = sum(perm.twas^2 > cur.twas[1]^2) / opt$perm
+						perm.pval = sum(perm.pwas^2 > cur.pwas[1]^2) / opt$perm
 						perm.N = opt$perm
 						# also estimate analytical p-value based on mu+sd of the null			
-						anal.zscore = ( cur.twas[1] - 0 ) / sd( perm.twas , na.rm=T )
+						anal.zscore = ( cur.pwas[1] - 0 ) / sd( perm.pwas , na.rm=T )
 					} else {
 						anal.zscore = NA
 					}
@@ -344,7 +344,7 @@ for ( w in 1:nrow(wgtlist) ) {
 	
 	if ( !cur.FAIL ) {
 		out.tbl$NWGT[w] = sum( wgt.matrix[,mod.best] != 0 )
-		out.tbl$PWAS.Z[w] = cur.twas
+		out.tbl$PWAS.Z[w] = cur.pwas
 		out.tbl$PWAS.P[w] = 2*(pnorm( abs(out.tbl$PWAS.Z[w]) , lower.tail=F))
 	} else {
 		out.tbl$PWAS.Z[w] = NA
