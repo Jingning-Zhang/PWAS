@@ -1,8 +1,8 @@
-
-suppressMessages(library(readr))
-suppressMessages(library(stringr))
-suppressMessages(library(dplyr))
-suppressMessages(library(plink2R))
+suppressMessages(library("optparse"))
+suppressMessages(library("readr"))
+suppressMessages(library("stringr"))
+suppressMessages(library("dplyr"))
+suppressMessages(library("plink2R"))
 
 option_list = list(
     make_option("--PWAS", action="store", default=NA, type='character',
@@ -24,7 +24,7 @@ opt = parse_args(OptionParser(option_list=option_list))
 
 tissue_list <- readLines(opt$tissue_list)
 
-dat.pwas <- read_tsv(opt$PWAS)
+dat.pwas <- suppressMessages(read_tsv(opt$PWAS))
 p.pwas <- 0.05/nrow(dat.pwas)
 dat.pwas <- dat.pwas[!(is.na(dat.pwas$PWAS.P)),]
 # z <- dat.pwas$PWAS.P; z <- z[!(is.na(z))]; z <- qnorm(z/2); pwas.lambdagc <- round(median(z^2)/0.454, 3)
@@ -52,13 +52,13 @@ for(i in 1:22){
 dat.sentinel <- dat.sentinel[!is.na(dat.sentinel$PWAS.P),]
 dat.sentinel.pwas <- dat.sentinel
 
-pred_prot <- read_tsv(opt$imputed_P)
+pred_prot <- suppressMessages(read_tsv(opt$imputed_P))
 
 for (tissue in tissue_list){
     
-    pred_ge <- read_tsv(paste0(opt$imputed_T,"/", tissue,".txt"))
+    pred_ge <- suppressMessages(read_tsv(paste0(opt$imputed_T,"/", tissue,".txt")))
     
-    dat.twas <- read_tsv(paste0(opt$TWAS,"/",tissue,".out"))
+    dat.twas <- suppressMessages(read_tsv(paste0(opt$TWAS,"/",tissue,".out")))
     
     dat.twas <- dat.twas[!(is.na(dat.twas$P0)),]
     dat.twas <- dat.twas[!(is.na(dat.twas$TWAS.P)),]
@@ -97,7 +97,7 @@ for (tissue in tissue_list){
             pred_mat = matrix(nrow=498,ncol=2)
             tmp <- strsplit(dat.sentinel.pwas$FILE[i], "/")[[1]]; tmp <- tmp[length(tmp)]; tmp <- substr(tmp, start=1, stop=nchar(tmp)-9)
             pred_mat[,1] = pred_prot[[tmp]]
-            tmp <- strsplit(dat.twas.tmp$FILE[i], "/")[[1]]; tmp <- tmp[length(tmp)]; tmp <- substr(tmp, start=nchar(dat.twas.tmp$PANEL[i])+2, stop=nchar(tmp)-9)
+            tmp <- strsplit(dat.twas.tmp$FILE[1], "/")[[1]]; tmp <- tmp[length(tmp)]; tmp <- substr(tmp, start=nchar(dat.twas.tmp$PANEL[1])+2, stop=nchar(tmp)-9)
             pred_mat[,2] = pred_ge[[tmp]]
             
             pred_mat = scale( pred_mat )
@@ -129,6 +129,8 @@ for (tissue in tissue_list){
          dist, corr, 
          # pwas.lambdagc, twas.lambdagc
          file = paste0(opt$out, "/",tissue,".RDat"))
+
+    cat(paste0("Conditional analysis for ", tissue, " is completed.\n"))
     
 }
 

@@ -1,3 +1,5 @@
+suppressMessages(library("readr"))
+
 ##############################
 # 1. Analyze by each tissue
 
@@ -10,7 +12,7 @@ for (tissue in tissue_list){
     
     load(paste0("./Results/ConditionalAnalysis/RDat/",tissue,".RDat"))
     
-    PWAS_hit=dat.sentinal.pwas$ID
+    PWAS_hit=dat.sentinel.pwas$ID
     
     for (i in 1:length(PWAS_hit)){
         
@@ -25,6 +27,8 @@ for (tissue in tissue_list){
                                    Dist_of_hits=Dist_of_hits, Corr_of_hits=Corr_of_hits,
                                    PcT_p=PcT_p, TcP_p=TcP_p)
     }
+
+    p.twas <- 0.05/readRDS("./GTex_V7_n_gene.rds")[tissue]
     
     TWAS_p <- numeric()
     TWAS_hit <- character()
@@ -46,8 +50,8 @@ for (tissue in tissue_list){
         TcP_p[i] <- res[[i]]$TcP_p
     }
     
-    a <- data.frame(PWAS_hit=dat.sentinal.pwas$ID,
-                    PWAS_p=signif(dat.sentinal$TWAS.P, 3),
+    a <- data.frame(PWAS_hit=dat.sentinel.pwas$ID,
+                    PWAS_p=signif(dat.sentinel.pwas$PWAS.P, 3),
                     TWAS_hit=ifelse(sig,paste0(TWAS_hit,"*"),TWAS_hit),
                     TWAS_p=ifelse(sig,paste0(signif(TWAS_p, 3),"*"),TWAS_p),
                     Dist_of_hits=Dist_of_hits,
@@ -55,7 +59,7 @@ for (tissue in tissue_list){
                     PcT_p=signif(PcT_p,3),
                     TcP_p=signif(TcP_p,3))
     
-    write_tsv(a, paste0("./Results/ConditionalAnalysis/Tables/",tissue,".txt"))
+    write_tsv(a, paste0("./Results/ConditionalAnalysis/Table/",tissue,".txt"))
     
 }
 
@@ -66,7 +70,7 @@ tissue_list <- readLines("./GTex_V7_tissue_list.txt")
 
 # get all the regional sentinel PWAS genes
 load(paste0("./Results/ConditionalAnalysis/RDat/",tissue_list[1],".RDat"))
-PWAS_hit=dat.sentinal.pwas$ID
+PWAS_hit=dat.sentinel.pwas$ID
 
 # multiple testing correction
 p.twas <- 0.05/sum(readRDS("./GTex_V7_n_gene.rds"))
@@ -145,7 +149,7 @@ a <- data.frame(min_TWAS_Tissue=ifelse(N_tiss!=0,paste0(min_tissue,"*"),min_tiss
                 N_significant_tissues_in_TWAS=N_tiss,
                 all_significant_tissues_in_TWAS=sig_tiss)
 
-write_tsv(a, paste0("./Results/ConditionalAnalysis/all-tissue.txt"))
+write_tsv(a, paste0("./Results/ConditionalAnalysis/Table/all-tissue.txt"))
 
 
 
