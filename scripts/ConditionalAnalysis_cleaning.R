@@ -3,17 +3,15 @@ suppressMessages(library("readr"))
 ##############################
 # 1. Analyze by each tissue
 
-tissue_list <- readLines("./GTex_V7_tissue_list.txt")
+tissue_list <- readLines("../GTex_V7_tissue_list.txt")
 
 
 for (tissue in tissue_list){
     
-    res <- list()
-    
-    load(paste0("./Results/ConditionalAnalysis/RDat/",tissue,".RDat"))
-    
+    load(paste0("../Results/ConditionalAnalysis/RDat/",tissue,".RDat"))
     PWAS_hit=dat.sentinel.pwas$ID
-    
+
+    res <- list()
     for (i in 1:length(PWAS_hit)){
         
         TWAS_hit <- twas.hit[i]
@@ -28,7 +26,7 @@ for (tissue in tissue_list){
                                    PcT_p=PcT_p, TcP_p=TcP_p)
     }
 
-    p.twas <- 0.05/readRDS("./GTex_V7_n_gene.rds")[tissue]
+    p.twas <- 0.05/readRDS("../GTex_V7_n_gene.rds")[tissue]
     
     TWAS_p <- numeric()
     TWAS_hit <- character()
@@ -59,21 +57,21 @@ for (tissue in tissue_list){
                     PcT_p=signif(PcT_p,3),
                     TcP_p=signif(TcP_p,3))
     
-    write_tsv(a, paste0("./Results/ConditionalAnalysis/Table/",tissue,".txt"))
+    write_tsv(a, paste0("../Results/ConditionalAnalysis/Table/",tissue,".txt"))
     
 }
 
 ##############################
 # 2. All-tissue analysis
 
-tissue_list <- readLines("./GTex_V7_tissue_list.txt")
+tissue_list <- readLines("../GTex_V7_tissue_list.txt")
 
 # get all the regional sentinel PWAS genes
-load(paste0("./Results/ConditionalAnalysis/RDat/",tissue_list[1],".RDat"))
+load(paste0("../Results/ConditionalAnalysis/RDat/",tissue_list[1],".RDat"))
 PWAS_hit=dat.sentinel.pwas$ID
 
 # multiple testing correction
-p.twas <- 0.05/sum(readRDS("./GTex_V7_n_gene.rds"))
+p.twas <- 0.05/sum(readRDS("../GTex_V7_n_gene.rds"))
 
 # for each regional sentinel PWAS gene, pick out the most significant nearby TWAS gene across all tissues
 res <- list()
@@ -89,7 +87,7 @@ for (i in 1:length(PWAS_hit)){
     for (j in 1:length(tissue_list)){
         tissue <- tissue_list[j]
         
-        load(paste0("./Results/ConditionalAnalysis/RDat/",tissue,".RDat"))
+        load(paste0("../Results/ConditionalAnalysis/RDat/",tissue,".RDat"))
         TWAS_hit[j] <- twas.hit[i]
         TWAS_p[j] <- twas.p[i]
         Dist_of_hits[j] <- dist[i]
@@ -149,7 +147,7 @@ a <- data.frame(min_TWAS_Tissue=ifelse(N_tiss!=0,paste0(min_tissue,"*"),min_tiss
                 N_significant_tissues_in_TWAS=N_tiss,
                 all_significant_tissues_in_TWAS=sig_tiss)
 
-write_tsv(a, paste0("./Results/ConditionalAnalysis/Table/all-tissue.txt"))
+write_tsv(a, paste0("../Results/ConditionalAnalysis/Table/all-tissue.txt"))
 
 
 

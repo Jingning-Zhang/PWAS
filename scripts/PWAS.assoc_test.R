@@ -79,7 +79,7 @@ wgtlist = wgtlist[ as.character(wgtlist$CHR) == as.character(opt$chr) , ]
 chr = unique(wgtlist$CHR)
 
 N = nrow(wgtlist)
-out.tbl = data.frame( "PANEL" = rep(NA,N) , "FILE" = character(N) , "ID" = character(N) , "CHR" = numeric(N) , "P0" = numeric(N) , "P1" = numeric(N) ,"HSQ" = numeric(N) , "BEST.GWAS.ID" = character(N) , "BEST.GWAS.Z" = numeric(N) , "EQTL.ID" = character(N) , "EQTL.R2" = numeric(N) , "EQTL.Z" = numeric(N) , "EQTL.GWAS.Z" = numeric(N) , "NSNP" = numeric(N) , "NWGT" = numeric(N) , "MODEL" = character(N) , "MODELCV.R2" = numeric(N) , "MODELCV.PV" = numeric(N) , "PWAS.Z" = numeric(N) , "PWAS.P" = numeric(N) , stringsAsFactors=FALSE )
+out.tbl = data.frame( "PANEL" = rep(NA,N) , "FILE" = character(N) , "ID" = character(N) , "CHR" = numeric(N) , "P0" = numeric(N) , "P1" = numeric(N) ,"HSQ" = numeric(N) , "BEST.GWAS.ID" = character(N) , "BEST.GWAS.Z" = numeric(N) , "PQTL.ID" = character(N) , "PQTL.R2" = numeric(N) , "PQTL.Z" = numeric(N) , "PQTL.GWAS.Z" = numeric(N) , "NSNP" = numeric(N) , "NWGT" = numeric(N) , "MODEL" = character(N) , "MODELCV.R2" = numeric(N) , "MODELCV.PV" = numeric(N) , "PWAS.Z" = numeric(N) , "PWAS.P" = numeric(N) , stringsAsFactors=FALSE )
 
 if ( opt$jlim ) {
 	suppressMessages(library('jlimR'))
@@ -301,16 +301,16 @@ for ( w in 1:nrow(wgtlist) ) {
 
 	eqtlmod = colnames(wgt.matrix) == "top1"
 	if ( cur.FAIL || sum(eqtlmod) == 0 ) {
-		out.tbl$EQTL.ID[w] = NA
-		out.tbl$EQTL.R2[w] = NA
-		out.tbl$EQTL.Z[w] =  NA
-		out.tbl$EQTL.GWAS.Z[w] = NA
+		out.tbl$PQTL.ID[w] = NA
+		out.tbl$PQTL.R2[w] = NA
+		out.tbl$PQTL.Z[w] =  NA
+		out.tbl$PQTL.GWAS.Z[w] = NA
 	} else {
 		topeqtl = which.max( wgt.matrix[,eqtlmod]^2 )
-		out.tbl$EQTL.ID[w] = rownames(wgt.matrix)[topeqtl]
-		out.tbl$EQTL.R2[w] = cv.performance[1,eqtlmod]
-		out.tbl$EQTL.Z[w] = wgt.matrix[ topeqtl , eqtlmod ]
-		out.tbl$EQTL.GWAS.Z[w] = cur.Z[ topeqtl ]
+		out.tbl$PQTL.ID[w] = rownames(wgt.matrix)[topeqtl]
+		out.tbl$PQTL.R2[w] = cv.performance[1,eqtlmod]
+		out.tbl$PQTL.Z[w] = wgt.matrix[ topeqtl , eqtlmod ]
+		out.tbl$PQTL.GWAS.Z[w] = cur.Z[ topeqtl ]
 		
 		# write CAVIAR inputs
 		if( opt$caviar ) {
@@ -318,7 +318,7 @@ for ( w in 1:nrow(wgtlist) ) {
 			rownames(cur.Z) = rownames(wgt.matrix)
 			cav.out = paste( opt$out , wgtlist$ID[w] , "CAVIAR" , sep='.' )
 			write.table( format(cur.LD,digits=3) , quote=F , col.names=F , row.names=F , file = paste( cav.out , ".LD" , sep='' ) )
-			write.table( format(wgt.matrix[,eqtlmod],digits=3) , quote=F , col.names=F , sep='\t' , file = paste( cav.out , ".EQTL.Z" , sep='') )
+			write.table( format(wgt.matrix[,eqtlmod],digits=3) , quote=F , col.names=F , sep='\t' , file = paste( cav.out , ".PQTL.Z" , sep='') )
 			write.table( format(cur.Z,digits=3) , quote=F , col.names=F , sep='\t' , file = paste( cav.out , ".GWAS.Z" , sep='') )
 		}
 		
