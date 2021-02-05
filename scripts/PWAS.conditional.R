@@ -27,8 +27,8 @@ tissue_list <- readLines(opt$tissue_list)
 dat.pwas <- suppressMessages(read_tsv(opt$PWAS))
 p.pwas <- 0.05/nrow(dat.pwas)
 dat.pwas <- dat.pwas[!(is.na(dat.pwas$PWAS.P)),]
-# z <- dat.pwas$PWAS.P; z <- z[!(is.na(z))]; z <- qnorm(z/2); pwas.lambdagc <- round(median(z^2)/0.454, 3)
 
+## get sentinel PWAS genes
 dat.sentinel <- tibble()
 dat <- dat.pwas[dat.pwas$PWAS.P < p.pwas,]
 for(i in 1:22){
@@ -52,19 +52,19 @@ for(i in 1:22){
 dat.sentinel <- dat.sentinel[!is.na(dat.sentinel$PWAS.P),]
 dat.sentinel.pwas <- dat.sentinel
 
-pred_prot <- suppressMessages(read_tsv(opt$imputed_P))
+pred_prot <- suppressMessages(read_tsv(opt$imputed_P)) # load imputed cis-regulated protein levels for reference individuals
 
 for (tissue in tissue_list){
     
-    pred_ge <- suppressMessages(read_tsv(paste0(opt$imputed_T,"/", tissue,".txt")))
+    pred_ge <- suppressMessages(read_tsv(paste0(opt$imputed_T,"/", tissue,".txt"))) # load imputed cis-regulated gene expression levels for reference individuals
     
-    dat.twas <- suppressMessages(read_tsv(paste0(opt$TWAS,"/",tissue,".out")))
+    dat.twas <- suppressMessages(read_tsv(paste0(opt$TWAS,"/",tissue,".out"))) # load TWAS result table
     
     dat.twas <- dat.twas[!(is.na(dat.twas$P0)),]
     dat.twas <- dat.twas[!(is.na(dat.twas$TWAS.P)),]
     
-    #z <- dat.twas$TWAS.P; z <- z[!(is.na(z))]; z <- qnorm(z/2); twas.lambdagc <- round(median(z^2)/0.454, 3)
     
+    ## perform conditional anlaysis for each sentinel PWAS gene and its nearby TWAS genes
     PcT.z <- numeric()
     PcT.p <- numeric()
     TcP.z <- numeric()
@@ -77,7 +77,9 @@ for (tissue in tissue_list){
         chr <- dat.sentinel.pwas$CHR[i]
         dat.twas.tmp <- dat.twas[dat.twas$CHR == chr, ]
         
-        tmp <- dat.twas.tmp[(dat.twas.tmp$P0 < dat.sentinel.pwas$P0[i] + 10^6) & (dat.twas.tmp$P0 > dat.sentinel.pwas$P0[i] - 10^6),]
+        ## extract out nearby TWAS genes
+        
+        tmp <- dat.twas.tmp[(dat.twas.tmp$P0 < dat.sentinel.pwas$P0[i] + 500000) & (dat.twas.tmp$P0 > dat.sentinel.pwas$P0[i] - 500000),]
         if(nrow(tmp)==0){
             PcT.z[i] <- NA
             TcP.z[i] <- NA
@@ -127,7 +129,6 @@ for (tissue in tissue_list){
          TcP.z, TcP.p,
          twas.p, twas.hit,
          dist, corr, 
-         # pwas.lambdagc, twas.lambdagc
          file = paste0(opt$out, "/",tissue,".RDat"))
 
     cat(paste0("Conditional analysis for ", tissue, " is completed.\n"))
