@@ -1,5 +1,7 @@
 suppressMessages(library("readr"))
 
+dir.create("../Results/ConditionalAnalysis/Table/")
+
 ##############################
 # 1. Analyze by each tissue
 
