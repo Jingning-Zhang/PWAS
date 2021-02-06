@@ -158,7 +158,7 @@ a <- data.frame(min_TWAS_Tissue=ifelse(N_tiss!=0,paste0(min_tissue,"*"),min_tiss
 
 write_tsv(a, paste0("../Results/ConditionalAnalysis/Table/all-tissue.txt"))
 
-
+ 
 
 
 

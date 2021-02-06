@@ -138,7 +138,7 @@ qc = allele.qc( sumstat$A1 , sumstat$A2 , genos$bim[,5] , genos$bim[,6] )
 # Flip Z-scores for mismatching alleles
 sumstat$Z[ qc$flip ] = -1 * sumstat$Z[ qc$flip ]
 sumstat$A1[ qc$flip ] = genos$bim[qc$flip,5]
-sumstat$A2[ qc$flip ] = genos$bim[qc$flip,6]
+sumstat$A2[ qc$flip ] = genos$bim[qc$flip,6] 
 
 # Remove strand ambiguous SNPs (if any)
 if ( sum(!qc$keep) > 0 ) {
@@ -166,15 +166,15 @@ for ( w in 1:nrow(wgtlist) ) {
     
 	snps = snps[m.keep,]
 	wgt.matrix = wgt.matrix[m.keep,,drop=F]
-	cur.genos = scale(genos$bed[,m[m.keep]])
-    cur.bim = genos$bim[m[m.keep],]
+	cur.genos = scale(genos$bed[,m[m.keep],drop=F])
+    cur.bim = genos$bim[m[m.keep],,drop=F]
     
     m.keep = apply(cur.genos,MARGIN=2,FUN=function(x){sum(is.nan(x))==0})
     
     snps = snps[m.keep,]
     wgt.matrix = wgt.matrix[m.keep,,drop=F]
-    cur.genos = cur.genos[,m.keep]
-    cur.bim = cur.bim[m.keep,]
+    cur.genos = cur.genos[,m.keep,drop=F]
+    cur.bim = cur.bim[m.keep,,drop=F]
     
 	# Flip WEIGHTS for mismatching alleles
 	qc = allele.qc( snps[,5] , snps[,6] , cur.bim[,5] , cur.bim[,6] )

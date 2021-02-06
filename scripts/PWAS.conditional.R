@@ -56,27 +56,21 @@ cat(paste0("There are ", nrow(dat.sentinel.pwas), " significant PWAS loci.\n"))
 
 pred_prot <- suppressMessages(read_tsv(opt$imputed_P)) # load imputed cis-regulated protein levels for reference individuals
 
-cat(paste0("Starting to perform conditional analysis --\n"))
+cat(paste0("Starting to perform conditional analysis in the listed tissues --\n"))
 
-for (tissue in tissue_list){
+for (tissue in tissue_list){ 
     
     pred_ge <- suppressMessages(read_tsv(paste0(opt$imputed_T,"/", tissue,".txt"))) # load imputed cis-regulated gene expression levels for reference individuals
     
     dat.twas <- suppressMessages(read_tsv(paste0(opt$TWAS,"/",tissue,".out"))) # load TWAS result table
-    
     dat.twas <- dat.twas[!(is.na(dat.twas$P0)),]
     dat.twas <- dat.twas[!(is.na(dat.twas$TWAS.P)),]
     
-    
     ## perform conditional anlaysis for each sentinel PWAS gene and its nearby TWAS genes
-    PcT.z <- numeric()
-    PcT.p <- numeric()
-    TcP.z <- numeric()
-    TcP.p <- numeric()
-    twas.p <- numeric()
-    twas.hit <- character()
-    dist <- integer()
-    corr <- numeric()
+    PcT.z <- numeric(); PcT.p <- numeric()
+    TcP.z <- numeric(); TcP.p <- numeric()
+    twas.p <- numeric(); twas.hit <- character()
+    dist <- integer(); corr <- numeric()
     for (i in 1:nrow(dat.sentinel.pwas)) {
         chr <- dat.sentinel.pwas$CHR[i]
         dat.twas.tmp <- dat.twas[dat.twas$CHR == chr, ]
@@ -85,14 +79,10 @@ for (tissue in tissue_list){
         
         tmp <- dat.twas.tmp[(dat.twas.tmp$P0 < dat.sentinel.pwas$P0[i] + 500000) & (dat.twas.tmp$P0 > dat.sentinel.pwas$P0[i] - 500000),]
         if(nrow(tmp)==0){
-            PcT.z[i] <- NA
-            TcP.z[i] <- NA
-            PcT.p[i] <- NA
-            TcP.p[i] <- NA
-            twas.p[i] <- NA
-            twas.hit[i] <- NA
-            dist[i] <- NA
-            corr[i] <- NA
+            PcT.z[i] <- NA; TcP.z[i] <- NA
+            PcT.p[i] <- NA; TcP.p[i] <- NA
+            twas.p[i] <- NA; twas.hit[i] <- NA
+            dist[i] <- NA; corr[i] <- NA
         }else{
             dat.twas.tmp <- tmp[which.min(tmp$TWAS.P),]
             dist[i] <- dat.twas.tmp$P0 - dat.sentinel.pwas$P0[i]
@@ -125,7 +115,6 @@ for (tissue in tissue_list){
             TcP.p[i] = 2*(pnorm( abs( TcP.z[i] ) , lower.tail=F))
             
         }
-        
     }
     
     save(dat.sentinel.pwas,
@@ -134,7 +123,7 @@ for (tissue in tissue_list){
          twas.p, twas.hit,
          dist, corr, 
          file = paste0(opt$out, "/",tissue,".RDat"))
-
+    
     cat(paste0(tissue, " is completed.\n"))
     
 }
