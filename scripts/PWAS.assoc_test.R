@@ -1,3 +1,5 @@
+### Acknowledge source codes from the TWAS / FUSION site by Gusev lab
+
 suppressMessages(library('plink2R'))
 suppressMessages(library("optparse"))
 
