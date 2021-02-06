@@ -52,7 +52,11 @@ for(i in 1:22){
 dat.sentinel <- dat.sentinel[!is.na(dat.sentinel$PWAS.P),]
 dat.sentinel.pwas <- dat.sentinel
 
+cat(paste0("There are ", nrow(dat.sentinel.pwas), " significant PWAS loci.\n"))
+
 pred_prot <- suppressMessages(read_tsv(opt$imputed_P)) # load imputed cis-regulated protein levels for reference individuals
+
+cat(paste0("Starting to perform conditional analysis --\n"))
 
 for (tissue in tissue_list){
     
@@ -131,7 +135,7 @@ for (tissue in tissue_list){
          dist, corr, 
          file = paste0(opt$out, "/",tissue,".RDat"))
 
-    cat(paste0("Conditional analysis for ", tissue, " is completed.\n"))
+    cat(paste0(tissue, " is completed.\n"))
     
 }
 

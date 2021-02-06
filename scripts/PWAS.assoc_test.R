@@ -23,7 +23,7 @@ option_list = list(
   make_option("--max_impute", action="store", default=0.5 , type='double',
               help="Maximum fraction of SNPs allowed to be missing per gene (will be imputed using LD). [default: %default]"),			  
   make_option("--min_r2pred", action="store", default=0.7 , type='double',
-              help="Minimum average LD-based imputation accuracy allowed for expression weight SNP Z-scores. [default: %default]"),			  
+              help="Minimum average LD-based imputation accuracy allowed for plasma protein weight SNP Z-scores. [default: %default]"),			  
   make_option("--perm", action="store", default=0, type='integer',
               help="Maximum number of permutations to perform for each feature test [default: 0/off]"),
   make_option("--perm_minp", action="store", default=0.05, type='double',
@@ -204,7 +204,7 @@ for ( w in 1:nrow(wgtlist) ) {
 	}
 	
 	if ( sum(wgt.matrix[, mod.best] != 0) == 0 ) {
-		cat( "WARNING : " , unlist(wgtlist[w,]) , names(cv.performance)[ mod.best ] , "had", length(cur.Z) , "overlapping SNPs, but none with non-zero expression weights, try more SNPS or a different model\n")
+		cat( "WARNING : " , unlist(wgtlist[w,]) , names(cv.performance)[ mod.best ] , "had", length(cur.Z) , "overlapping SNPs, but none with non-zero plasma protein weights, try more SNPS or a different model\n")
 		cur.FAIL = TRUE
 	}
 
@@ -237,7 +237,7 @@ for ( w in 1:nrow(wgtlist) ) {
 					cat( "WARNING : " , unlist(wgtlist[w,]) , "had missing GWAS Z-scores that could not be imputed, skipping this gene.\n" )
 					cur.FAIL = TRUE
 				} else if ( mean( all.r2pred[ wgt.matrix[,mod.best] != 0 ] ) < opt$min_r2pred ) {
-					cat( "WARNING : " , unlist(wgtlist[w,]) , "had mean GWAS Z-score imputation r2 of" , mean( all.r2pred[ wgt.matrix[,mod.best] != 0 ] ) , "at expression weight SNPs, skipping this gene.\n")
+					cat( "WARNING : " , unlist(wgtlist[w,]) , "had mean GWAS Z-score imputation r2 of" , mean( all.r2pred[ wgt.matrix[,mod.best] != 0 ] ) , "at plasma protein weight SNPs, skipping this gene.\n")
 					cur.FAIL = TRUE
 				}
 			}
@@ -374,7 +374,7 @@ for ( w in 1:nrow(wgtlist) ) {
 cat("Analysis completed.\n")
 cat("NOTE:",FAIL.ctr,"/",nrow(wgtlist),"genes were skipped\n")
 if ( FAIL.ctr / nrow(wgtlist) > 0.1 ) {
-cat("If a large number of genes were skipped, verify that your GWAS Z-scores, expression weights, and LDREF data use the same SNPs (or nearly)\n")
+cat("If a large number of genes were skipped, verify that your GWAS Z-scores, plasma protein weights, and LDREF data use the same SNPs (or nearly)\n")
 cat("Or consider pre-imputing your summary statistics to the LDREF markers using summary-imputation software such as [http://bogdan.bioinformatics.ucla.edu/software/impg/]\n")
 }
 
