@@ -15,7 +15,7 @@ option_list = list(
   make_option("--ref_ld_chr", action="store", default=NA, type='character',
               help="Prefix to reference LD files in binary PLINK format by chromosome [required]"),
   make_option("--force_model", action="store", default='enet', type='character',
-              help="enet is the currently only available option to perform PWAS"),
+              help="enet and top1 are the currently only available options to perform PWAS"),
   make_option("--caviar", action="store_true", default=FALSE,
               help="Generate eCAVIAR-format (Z,LD) files for fine-mapping [default off]"),
   make_option("--jlim", action="store_true", default=FALSE,
