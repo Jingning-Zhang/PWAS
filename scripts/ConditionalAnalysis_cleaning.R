@@ -3,16 +3,17 @@ suppressMessages(library("readr"))
 dir.create("../Results/ConditionalAnalysis/Table/")
 
 ##############################
-# 1. Analyze by each tissue
+# 1. Analyze certain tissue (usually relevant tissues)
 
-tissue_list <- readLines("../GTex_V7_tissue_list.txt")
+tissue_list <- readLines("../GTex_V7_tissue_list.txt") ## the list of tissue to be analyzed
 
 
 for (tissue in tissue_list){
     
+    ## load and reformat conditional analysis outputs
+    
     load(paste0("../Results/ConditionalAnalysis/RDat/",tissue,".RDat"))
     PWAS_hit=dat.sentinel.pwas$ID
-
     res <- list()
     for (i in 1:length(PWAS_hit)){
         
@@ -27,8 +28,11 @@ for (tissue in tissue_list){
                                    Dist_of_hits=Dist_of_hits, Corr_of_hits=Corr_of_hits,
                                    PcT_p=PcT_p, TcP_p=TcP_p)
     }
-
+    
+    ## TWAS significance level corrected by number of transcripts
     p.twas <- 0.05/readRDS("../GTex_V7_n_gene.rds")[tissue]
+    
+    ## reformat to output tables (if a TWAS gene reaches significance level, will be marked with a star)
     
     TWAS_p <- numeric()
     TWAS_hit <- character()
@@ -72,10 +76,7 @@ tissue_list <- readLines("../GTex_V7_tissue_list.txt")
 load(paste0("../Results/ConditionalAnalysis/RDat/",tissue_list[1],".RDat"))
 PWAS_hit=dat.sentinel.pwas$ID
 
-# multiple testing correction
-p.twas <- 0.05/sum(readRDS("../GTex_V7_n_gene.rds"))
-
-# for each regional sentinel PWAS gene, pick out the most significant nearby TWAS gene across all tissues
+## load and reformat conditional analysis outputs
 res <- list()
 for (i in 1:length(PWAS_hit)){
     
@@ -104,6 +105,10 @@ for (i in 1:length(PWAS_hit)){
     
 }
 
+# TWAS significance level corrected for the total number of transcripts in all tissues
+p.twas <- 0.05/sum(readRDS("../GTex_V7_n_gene.rds"))
+
+# for each regional sentinel PWAS gene, pick out the most significant nearby TWAS gene across all tissues
 min_TWAS_p <- numeric()
 min_tissue <- character()
 min_TWAS_hit <- character()
@@ -117,17 +122,17 @@ for (i in 1:length(res)){
     m <- (res[[i]]$TWAS_p < p.twas)
     m[is.na(m)] <- FALSE
     if(sum(m)>0){
-        sig_tiss[i] <- paste(tissue_list[m],collapse=",")
-        N_tiss[i] <- length(tissue_list[m])
-        min_TWAS_p[i] <- min(res[[i]]$TWAS_p[m])
-        min_tissue[i] <- tissue_list[m][which.min(res[[i]]$TWAS_p[m])]
-        min_TWAS_hit[i] <- res[[i]]$TWAS_hit[m][which.min(res[[i]]$TWAS_p[m])]
-        min_Dist_of_hits[i] <- res[[i]]$Dist_of_hits[m][which.min(res[[i]]$TWAS_p[m])]
-        min_Corr_of_hits[i] <- res[[i]]$Corr_of_hits[m][which.min(res[[i]]$TWAS_p[m])]
-        min_PcT_p[i] <- res[[i]]$PcT_p[m][which.min(res[[i]]$TWAS_p[m])]
-        min_TcP_p[i] <- res[[i]]$TcP_p[m][which.min(res[[i]]$TWAS_p[m])]
-    }else{
-        sig_tiss[i] <- NA
+        sig_tiss[i] <- paste(tissue_list[m],collapse=",") # all signifianct tissues in this loci (tissues with at least one significant TWAS gene in this loci)
+        N_tiss[i] <- length(tissue_list[m]) # number of signifianct tissues in this loci 
+        min_TWAS_p[i] <- min(res[[i]]$TWAS_p[m]) # find the minimum TWAS p-value 
+        min_tissue[i] <- tissue_list[m][which.min(res[[i]]$TWAS_p[m])] # find its corresponding tissue
+        min_TWAS_hit[i] <- res[[i]]$TWAS_hit[m][which.min(res[[i]]$TWAS_p[m])] # find its corresponding TWAS gene
+        min_Dist_of_hits[i] <- res[[i]]$Dist_of_hits[m][which.min(res[[i]]$TWAS_p[m])] # its distance to the sentinel PWAS gene
+        min_Corr_of_hits[i] <- res[[i]]$Corr_of_hits[m][which.min(res[[i]]$TWAS_p[m])] # its cis-regulated genetic correlation with the sentinel PWAS gene
+        min_PcT_p[i] <- res[[i]]$PcT_p[m][which.min(res[[i]]$TWAS_p[m])] # conditional p-value (P|T)
+        min_TcP_p[i] <- res[[i]]$TcP_p[m][which.min(res[[i]]$TWAS_p[m])] # conditional p-value (T|P)
+    }else{ # if no significant tissue in this loci
+        sig_tiss[i] <- NA 
         N_tiss[i] <- 0
         min_TWAS_p[i] <- min(res[[i]]$TWAS_p, na.rm = T)
         min_tissue[i] <- tissue_list[which.min(res[[i]]$TWAS_p)]
@@ -138,6 +143,8 @@ for (i in 1:length(res)){
         min_TcP_p[i] <- res[[i]]$TcP_p[which.min(res[[i]]$TWAS_p)]
     }
 }
+
+## reformat to the output table 
 
 a <- data.frame(min_TWAS_Tissue=ifelse(N_tiss!=0,paste0(min_tissue,"*"),min_tissue),
                 min_TWAS_TWAS_hit=ifelse(N_tiss!=0,paste0(min_TWAS_hit,"*"),min_TWAS_hit),
