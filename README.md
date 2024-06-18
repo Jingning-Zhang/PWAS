@@ -18,8 +18,7 @@ recent paper. Please cite both the manuscript for primary TWAS methods
 and the recent pQTL and PWAS paper:
 
 > - Gusev, et al. “Integrative approaches for large-scale transcriptome-wide association studies” 2016 Nature Genetics
-> - Zhang, Chaterjee, et al. “Large Bi-Ethnic Study of Plasma Proteome Leads to Comprehensive Mapping of cis-pQTL and Models for Proteome-wide Association Studies” **doi**:
-https://doi.org/10.1101/2021.03.15.435533
+> - Zhang, Jingning, et al. “Plasma proteome analyses in individuals of European and African ancestry identify cis-pQTLs and models for proteome-wide association studies.” Nature Genetics 54.5 (2022): 593-602.
 
 
 
