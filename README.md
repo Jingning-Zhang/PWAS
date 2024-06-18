@@ -17,10 +17,8 @@ modifications. The bivariate conditional analysis was described in our
 recent paper. Please cite both the manuscript for primary TWAS methods
 and the recent pQTL and PWAS paper:
 
-> - Gusev, et al. “Integrative approaches for large-scale transcriptome-wide association studies” 2016 Nature Genetics
 > - Zhang, Jingning, et al. “Plasma proteome analyses in individuals of European and African ancestry identify cis-pQTLs and models for proteome-wide association studies.” Nature Genetics 54.5 (2022): 593-602.
-
-
+> - Gusev, et al. “Integrative approaches for large-scale transcriptome-wide association studies” 2016 Nature Genetics
 
 Note that we stored the trained models and required data for two ethnic groups separately (<span style="background-color: #d9d9d9">PWAS\_[EA/AA]</span>). [EA/AA] in file or directory names represents the ancestry where we trained these models (<span style="background-color: #d9d9d9">EA</span> represents for <span style="background-color: #d9d9d9">European Americans</span> and <span style="background-color: #d9d9d9">AA</span> represents for <span style="background-color: #d9d9d9">African Americans</span>). We recommend matching the ancestry to your GWAS summary data. 
 
